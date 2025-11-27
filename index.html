@@ -2,185 +2,380 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>東京冬旅 (內建翻譯版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>東京冬旅 (豪華版)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-light: #818cf8;
-            --bg-gradient: linear-gradient(135deg, #4338ca, #6366f1);
-            --bg-gray: #f3f4f6;
-            --text-dark: #1f2937;
-            --text-gray: #6b7280;
+            --primary-dark: #3730a3;
+            --bg-gray: #f8fafc;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
             --orange: #f97316;
             --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.85);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-gray);
             margin: 0;
             padding: 0;
-            padding-bottom: 100px;
+            padding-bottom: 110px; /* 增加底部空間給導航列 */
             color: var(--text-dark);
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 頭部設計 --- */
-        .header-container {
-            background: var(--bg-gradient);
-            padding: 20px 0 15px;
+        /* --- Hero Section (東京鐵塔封面) --- */
+        .hero-header {
+            /* 背景圖：東京鐵塔夜景 + 漸層遮罩 */
+            background: 
+                linear-gradient(to bottom, rgba(30, 27, 75, 0.3), rgba(15, 23, 42, 0.6), rgba(248, 250, 252, 1)),
+                url('https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=1000&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+            height: 300px; /* 加高一點讓畫面更震撼 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        }
+
+        .app-title h1 { 
+            margin: 0; 
+            font-size: 14px; 
+            font-weight: 600; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .app-title span { 
+            font-size: 42px; 
+            font-weight: 800; 
+            display: block; 
+            letter-spacing: -1px;
+        }
+        
+        /* 即時時間樣式 */
+        .live-clock {
+            margin-top: 15px;
+            font-size: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* --- 黏性日期導航列 --- */
+        .sticky-nav-wrapper {
             position: sticky;
             top: 0;
-            z-index: 1000;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
-            color: white;
+            z-index: 999;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            margin-top: -20px; /* 稍微往上蓋住 header 的邊緣 */
+            border-radius: 20px 20px 0 0;
         }
-        .top-bar { padding: 0 20px; margin-bottom: 15px; }
-        .app-title h1 { margin: 0; font-size: 20px; font-weight: 700; opacity: 0.9; }
-        .app-title span { font-size: 28px; font-weight: 800; display: block; }
 
-        /* --- 日期滑動區 --- */
-        .date-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; scrollbar-width: none; }
-        .date-scroller::-webkit-scrollbar { display: none; }
-        .date-card {
-            min-width: 55px; background: rgba(255,255,255,0.15); color: white; border-radius: 16px;
-            padding: 10px 5px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;
+        .date-scroller { 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            padding: 0 20px; 
+            scrollbar-width: none; 
+            scroll-behavior: smooth;
         }
-        .date-card.active { background: white; color: var(--primary); transform: scale(1.05); font-weight: bold; }
-        .date-text { font-size: 12px; margin-bottom: 2px; opacity: 0.9; }
+        .date-scroller::-webkit-scrollbar { display: none; }
+        
+        .date-card {
+            min-width: 60px; 
+            background: white; 
+            color: var(--text-gray); 
+            border-radius: 16px;
+            padding: 10px 6px; 
+            text-align: center; 
+            cursor: pointer; 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            flex-shrink: 0;
+        }
+        .date-card.active { 
+            background: var(--primary); 
+            color: white; 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+            border-color: var(--primary);
+        }
+        .date-text { font-size: 11px; margin-bottom: 3px; opacity: 0.9; }
         .day-text { font-size: 18px; font-weight: 800; }
 
         /* --- 內容區塊 --- */
         .container { padding: 20px; max-width: 600px; margin: 0 auto; }
-        .page { display: none; animation: fadeIn 0.3s; }
+        .page { display: none; animation: fadeIn 0.4s ease-out; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- 天氣與行程 --- */
         .weather-banner {
-            margin-bottom: 20px; background: white; padding: 12px 20px; border-radius: 16px;
-            display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px; 
+            background: white; 
+            padding: 18px 24px; 
+            border-radius: 24px;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); 
+            border: 1px solid white;
         }
-        .timeline-container { position: relative; }
-        .timeline-line { position: absolute; left: 38px; top: 20px; bottom: 20px; width: 2px; background: #e5e7eb; z-index: 0; }
-        .timeline-item { display: flex; gap: 15px; margin-bottom: 20px; position: relative; z-index: 1; }
+        
+        .timeline-container { position: relative; padding-left: 10px; }
+        .timeline-line { position: absolute; left: 48px; top: 20px; bottom: 20px; width: 2px; background: #e2e8f0; z-index: 0; border-radius: 2px; }
+        .timeline-item { display: flex; gap: 18px; margin-bottom: 25px; position: relative; z-index: 1; }
+        
         .time-box {
-            background: white; min-width: 75px; height: 75px; border-radius: 18px;
+            background: white; min-width: 76px; height: 76px; border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; z-index: 2;
         }
         .content-card {
-            flex: 1; background: white; border-radius: 18px; padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; position: relative;
+            flex: 1; background: white; border-radius: 20px; padding: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; position: relative;
+            transition: transform 0.2s;
         }
-        .btn-delete { position: absolute; bottom: 10px; right: 10px; color: #fab1a0; background: none; border: none; cursor: pointer; }
-        .card-icon-bg { position: absolute; right: 15px; top: 15px; font-size: 20px; color: #f3f4f6; }
+        .content-card:active { transform: scale(0.98); }
+        .btn-delete { 
+            position: absolute; bottom: 12px; right: 12px; 
+            color: #cbd5e1; background: none; border: none; 
+            cursor: pointer; transition: color 0.2s; padding: 5px;
+        }
+        .btn-delete:hover { color: var(--danger); }
+        .card-icon-bg { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #f1f5f9; }
 
-        /* --- 翻譯樣式 (升級) --- */
-        .translate-box { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .phrase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        /* --- 翻譯樣式 --- */
+        .translate-box { background: white; padding: 24px; border-radius: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .phrase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .phrase-card { 
-            background: white; padding: 15px; border-radius: 16px; border: 1px solid #eee; 
-            text-align: center; cursor: pointer; transition: transform 0.1s; position: relative;
+            background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; 
+            text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
         }
-        .phrase-card:active { transform: scale(0.95); background: #f0fdf4; border-color: #4ade80; }
-        .jp-text { font-size: 18px; font-weight: bold; color: var(--primary); display: block; margin-bottom: 4px; }
-        .cn-text { font-size: 12px; color: #666; }
-        .speaker-icon { position: absolute; top: 8px; right: 8px; font-size: 12px; color: #e5e7eb; }
+        .phrase-card:active { transform: scale(0.96); background: #f0fdf4; border-color: #4ade80; }
+        .jp-text { font-size: 16px; font-weight: bold; color: var(--primary); display: block; margin-bottom: 4px; }
+        .cn-text { font-size: 12px; color: #64748b; }
 
-        /* 翻譯結果顯示區 */
         .trans-result-card {
-            margin-top: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
-            padding: 15px; display: none; align-items: center; justify-content: space-between;
+            margin-top: 15px; background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 16px;
+            padding: 20px; display: none; align-items: center; justify-content: space-between;
         }
-        .result-jp { font-size: 20px; font-weight: 800; color: var(--primary-light); }
+        .result-jp { font-size: 22px; font-weight: 800; color: #0d9488; }
         .btn-speak-result {
-            width: 40px; height: 40px; border-radius: 50%; background: white; border: 1px solid #ddd;
-            color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; border-radius: 50%; background: white; border: 1px solid #ccfbf1;
+            color: #0d9488; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         /* --- 記帳樣式 --- */
+        .budget-header {
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: white; padding: 35px 20px; border-radius: 28px; text-align: center; margin-bottom: 25px;
+            box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.4);
+        }
         .budget-card {
-            background: white; padding: 20px; border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 12px;
+            background: white; padding: 20px; border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 12px; border: 1px solid #f1f5f9;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .budget-info { display: flex; flex-direction: column; }
-        .budget-name { font-size: 16px; font-weight: bold; color: var(--text-dark); }
-        .budget-cost { font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 4px; }
-        .budget-actions { display: flex; gap: 12px; }
-        .btn-icon { width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .btn-edit { background: #e0e7ff; color: var(--primary); }
-        .btn-trash { background: #fee2e2; color: var(--danger); }
-        
+
         /* --- 通用元件 --- */
-        .form-input { width: 100%; padding: 14px; margin-bottom: 12px; background: #fff; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-        .btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: opacity 0.2s; }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-        .fab-add { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; background: var(--text-dark); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; z-index: 900; }
-        .fab-map-btn { position: fixed; bottom: 90px; left: 20px; background: white; color: var(--text-dark); padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 13px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; cursor: pointer; z-index: 900; }
+        .form-input { width: 100%; padding: 15px; margin-bottom: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.2s; }
+        .form-input:focus { border-color: var(--primary); background: white; }
+        
+        .btn-submit { 
+            width: 100%; padding: 15px; 
+            background: var(--primary); color: white; 
+            border: none; border-radius: 14px; 
+            font-weight: bold; cursor: pointer; font-size: 16px; 
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); 
+            transition: transform 0.1s; 
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        
+        /* 懸浮按鈕群 */
+        .fab-add { 
+            position: fixed; bottom: 100px; right: 20px; 
+            width: 60px; height: 60px; 
+            background: var(--text-dark); color: white; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+            cursor: pointer; z-index: 900; 
+            transition: transform 0.2s; 
+        }
+        .fab-add:active { transform: scale(0.9); }
+        
+        .fab-map-btn { 
+            position: fixed; bottom: 100px; left: 20px; 
+            background: white; color: var(--text-dark); 
+            padding: 14px 24px; border-radius: 30px; 
+            font-weight: 700; font-size: 14px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            display: flex; align-items: center; gap: 8px; 
+            cursor: pointer; z-index: 900; 
+            transition: transform 0.2s; 
+            border: 1px solid #f1f5f9; 
+        }
+        .fab-map-btn:active { transform: scale(0.95); }
+
+        /* 回到頂部按鈕 (固定位置) */
+        .back-to-top {
+            position: fixed; 
+            bottom: 180px; /* 在新增按鈕上方 */
+            right: 28px; 
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.9); 
+            backdrop-filter: blur(5px);
+            color: var(--primary); 
+            border: 1px solid #e2e8f0; 
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            cursor: pointer; z-index: 899;
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+        }
+        .back-to-top.show { 
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateY(0); 
+        }
 
         /* --- 彈窗與導航 --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal { background: white; width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; animation: popUp 0.3s; }
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); 
+            display: none; align-items: center; justify-content: center; z-index: 2000; 
+        }
+        .modal { 
+            background: white; width: 85%; max-width: 340px; padding: 30px; 
+            border-radius: 28px; 
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25); 
+        }
         @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { text-align: center; color: var(--text-gray); font-size: 10px; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
+
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; 
+            background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; 
+            padding: 12px 0 25px; 
+            border-top: 1px solid rgba(0,0,0,0.05); 
+            z-index: 1000; 
+        }
+        .nav-item { 
+            text-align: center; color: var(--text-gray); font-size: 10px; 
+            cursor: pointer; transition: color 0.2s; position: relative; width: 60px;
+        }
+        .nav-item.active { color: var(--primary); font-weight: 600; }
+        .nav-item i { font-size: 22px; margin-bottom: 5px; display: block; transition: transform 0.2s; }
+        .nav-item.active i { transform: translateY(-3px); }
 
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div class="top-bar">
-            <div class="app-title"><h1>東京冬旅</h1><span>Tokyo</span></div>
+    <!-- Hero Section: 東京鐵塔背景 -->
+    <div class="hero-header" id="hero">
+        <div class="app-title">
+            <h1>Tokyo Winter Trip</h1>
+            <span>東京冬旅</span>
         </div>
+        <!-- 即時時間 -->
+        <div class="live-clock" id="clock">
+            <i class="far fa-clock"></i> <span id="time-text">--:--:--</span>
+        </div>
+    </div>
+
+    <!-- 黏性日期導航 -->
+    <div class="sticky-nav-wrapper">
         <div class="date-scroller" id="dateNav"></div>
     </div>
 
     <div class="container">
+        <!-- 行程頁面 -->
         <div id="page-itinerary" class="page active">
             <div class="weather-banner">
                 <div style="display:flex; align-items:center;">
-                    <div style="font-size:24px; margin-right:15px;" id="weatherIcon">☀️</div>
-                    <div><div style="font-weight:600;" id="weatherText">...</div><div style="font-size:12px; color:#666;" id="weatherTip"></div></div>
+                    <div style="font-size:36px; margin-right:15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));" id="weatherIcon">☀️</div>
+                    <div>
+                        <div style="font-weight:700; font-size:18px; color:var(--text-dark);" id="weatherText">...</div>
+                        <div style="font-size:13px; color:#64748b;" id="weatherTip"></div>
+                    </div>
                 </div>
             </div>
-            <div class="timeline-container"><div class="timeline-line"></div><div id="timeline-list"></div></div>
-            <div class="fab-map-btn" onclick="openGoogleRoute()"><i class="fas fa-map-marked-alt" style="color:#34A853;"></i> Google 路線</div>
-            <div class="fab-add" onclick="openModal()"><i class="fas fa-plus"></i></div>
-            <div style="text-align:center; margin-top:30px;"><button onclick="resetData()" style="background:none; border:none; color:#ccc; text-decoration:underline;">重置</button></div>
+            
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                <div id="timeline-list"></div>
+            </div>
+
+            <div class="fab-map-btn" onclick="openGoogleRoute()">
+                <i class="fas fa-map-marked-alt" style="color:#34A853;"></i> Google 路線
+            </div>
+            <div class="fab-add" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+            </div>
         </div>
 
+        <!-- 翻譯頁面 -->
         <div id="page-translate" class="page">
             <div class="translate-box">
-                <h3 style="margin-top:0; color:#333;">🇯🇵 實用會話 (點擊發音)</h3>
+                <h3 style="margin-top:0; color:#333; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-comment-dots" style="color:var(--primary);"></i> 實用會話
+                </h3>
                 <div class="phrase-grid">
-                    <div class="phrase-card" onclick="speak('ありがとう')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">ありがとう</span><span class="cn-text">謝謝</span></div>
-                    <div class="phrase-card" onclick="speak('すみません')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">すみません</span><span class="cn-text">不好意思</span></div>
-                    <div class="phrase-card" onclick="speak('いくらですか')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">いくら？</span><span class="cn-text">多少錢？</span></div>
-                    <div class="phrase-card" onclick="speak('トイレはどこですか')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">トイレは？</span><span class="cn-text">廁所在哪？</span></div>
-                    <div class="phrase-card" onclick="speak('これをください')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">これ下さい</span><span class="cn-text">我要這個</span></div>
-                    <div class="phrase-card" onclick="speak('お会計をお願いします')"><i class="fas fa-volume-up speaker-icon"></i><span class="jp-text">お会計</span><span class="cn-text">我要結帳</span></div>
+                    <div class="phrase-card" onclick="speak('ありがとう')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">ありがとう</span><span class="cn-text">謝謝</span></div>
+                    <div class="phrase-card" onclick="speak('すみません')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">すみません</span><span class="cn-text">不好意思</span></div>
+                    <div class="phrase-card" onclick="speak('いくらですか')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">いくら？</span><span class="cn-text">多少錢？</span></div>
+                    <div class="phrase-card" onclick="speak('トイレはどこですか')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">トイレは？</span><span class="cn-text">廁所在哪？</span></div>
+                    <div class="phrase-card" onclick="speak('これをください')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">これ下さい</span><span class="cn-text">我要這個</span></div>
+                    <div class="phrase-card" onclick="speak('お会計をお願いします')"><i class="fas fa-volume-up" style="position:absolute; top:8px; right:8px; color:#cbd5e1;"></i><span class="jp-text">お会計</span><span class="cn-text">我要結帳</span></div>
                 </div>
             </div>
             
             <div class="translate-box">
-                <h3 style="margin-top:0; color:#333;"> 即時翻譯</h3>
-                <input type="text" id="trans-input" class="form-input" placeholder="輸入中文 (例如: 沒有香菜)">
-                <button onclick="fetchTranslation()" id="btn-trans" class="btn-submit" style="background:#4f46e5;">
+                <h3 style="margin-top:0; color:#333; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-robot" style="color:var(--primary);"></i> AI 翻譯
+                </h3>
+                <input type="text" id="trans-input" class="form-input" placeholder="輸入中文 (例如: 不要蔥)">
+                <button onclick="fetchTranslation()" id="btn-trans" class="btn-submit">
                     <i class="fas fa-language"></i> 翻譯成日文
                 </button>
                 
                 <div class="trans-result-card" id="trans-result-box">
                     <div>
-                        <div style="font-size:10px; color:#888;">日文翻譯：</div>
+                        <div style="font-size:10px; color:#0d9488; margin-bottom:4px;">日文翻譯：</div>
                         <div class="result-jp" id="trans-output">...</div>
                     </div>
                     <button class="btn-speak-result" onclick="speakResult()">
@@ -190,33 +385,60 @@
             </div>
         </div>
 
+        <!-- 記帳頁面 -->
         <div id="page-budget" class="page">
-            <div style="background:white; padding:30px; border-radius:20px; text-align:center; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-                <div style="font-size:12px; color:#888;">總支出</div>
-                <div style="font-size:36px; font-weight:800; color:var(--primary); margin:5px 0;">¥ <span id="total-yen">0</span></div>
-                <div style="font-size:14px; color:#555;">≈ NT$ <span id="total-twd">0</span></div>
+            <div class="budget-header">
+                <div style="font-size:13px; opacity:0.8; margin-bottom:5px;">旅程總支出</div>
+                <div style="font-size:42px; font-weight:800; text-shadow:0 2px 10px rgba(0,0,0,0.1);">¥ <span id="total-yen">0</span></div>
+                <div style="font-size:15px; background:rgba(255,255,255,0.2); display:inline-block; padding:4px 12px; border-radius:15px; margin-top:10px;">≈ NT$ <span id="total-twd">0</span></div>
             </div>
-            <div style="background:white; padding:20px; border-radius:20px; margin-bottom:20px; border:1px solid #eee;" id="budget-input-area">
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <input type="text" id="expense-name" placeholder="項目" class="form-input" style="margin:0; flex:2;">
-                    <input type="number" id="expense-amount" placeholder="金額" class="form-input" style="margin:0; flex:1;">
+            <div style="background:white; padding:24px; border-radius:24px; margin-bottom:24px; border:1px solid #f1f5f9; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);" id="budget-input-area">
+                <div style="display:flex; gap:10px; margin-bottom:5px;">
+                    <input type="text" id="expense-name" placeholder="項目 (如: 拉麵)" class="form-input" style="margin:0; flex:2;">
+                    <input type="number" id="expense-amount" placeholder="日幣金額" class="form-input" style="margin:0; flex:1;">
                 </div>
-                <button onclick="addExpense()" class="btn-submit">＋ 記一筆</button>
+                <button onclick="addExpense()" class="btn-submit" style="margin-top:15px;">＋ 記一筆</button>
             </div>
             <div id="expense-list"></div>
         </div>
     </div>
 
+    <!-- 回到頂部按鈕 -->
+    <div class="back-to-top" id="backToTopBtn" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- 彈窗Modal -->
     <div class="modal-overlay" id="addModal">
         <div class="modal">
-            <h3 style="margin-top:0; color:var(--primary);">新增行程</h3>
-            <div style="margin-bottom:10px;"><input type="time" id="input-time" class="form-input" value="10:00"></div>
-            <div style="margin-bottom:10px;"><input type="text" id="input-title" class="form-input" placeholder="地點"></div>
-            <div style="margin-bottom:10px;"><input type="text" id="input-desc" class="form-input" placeholder="備註"></div>
-            <div style="margin-bottom:15px;"><select id="input-icon" class="form-input"><option value="fa-map-marker-alt">📍 景點</option><option value="fa-utensils">🍜 美食</option><option value="fa-shopping-bag">🛍️ 購物</option><option value="fa-train">🚇 交通</option></select></div>
-            <div style="display:flex; gap:10px;"><button class="btn-submit" style="background:#eee; color:#333;" onclick="closeModal()">取消</button><button class="btn-submit" onclick="saveNewItem()">儲存</button></div>
+            <h3 style="margin-top:0; color:var(--text-dark); font-size:22px; margin-bottom:20px;">新增行程</h3>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">時間</label>
+                <input type="time" id="input-time" class="form-input" value="10:00">
+            </div>
+            <div style="margin-bottom:12px;">
+                <input type="text" id="input-title" class="form-input" placeholder="地點名稱">
+            </div>
+            <div style="margin-bottom:12px;">
+                <input type="text" id="input-desc" class="form-input" placeholder="備註 (如: 買門票)">
+            </div>
+            <div style="margin-bottom:25px;">
+                <select id="input-icon" class="form-input">
+                    <option value="fa-map-marker-alt">📍 景點</option>
+                    <option value="fa-utensils">🍜 美食</option>
+                    <option value="fa-shopping-bag">🛍️ 購物</option>
+                    <option value="fa-train">🚇 交通</option>
+                    <option value="fa-camera">📸 拍照</option>
+                    <option value="fa-coffee">☕ 休息</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-submit" style="background:#f1f5f9; color:#64748b;" onclick="closeModal()">取消</button>
+                <button class="btn-submit" onclick="saveNewItem()">儲存</button>
+            </div>
         </div>
     </div>
+
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchPage('itinerary', this)"><i class="fas fa-calendar-check"></i> 行程</div>
         <div class="nav-item" onclick="switchPage('translate', this)"><i class="fas fa-language"></i> 翻譯</div>
@@ -224,45 +446,106 @@
     </div>
 
     <script>
-        // Data & Init
-        const weatherData = { 1: {icon:"✈️",text:"多雲",tip:"出發"}, 2: {icon:"☀️",text:"晴朗",tip:"戴墨鏡"}, 3: {icon:"🌧️",text:"小雨",tip:"帶傘"}, 4: {icon:"☀️",text:"晴朗",tip:"夜景"}, 5: {icon:"⛅",text:"陰天",tip:"舒適"}, 6: {icon:"✈️",text:"返程",tip:"檢查行李"} };
-        const defaultData = { 1: [{time:"16:30",title:"抵達東京",desc:"成田入境",icon:"fa-plane"}], 2: [{time:"10:30",title:"春日部",desc:"蠟筆小新",icon:"fa-gamepad"}], 3:[], 4:[], 5:[], 6:[] };
+        // --- 預設資料設定 ---
+        const weatherData = { 
+            1: {icon:"✈️",text:"抵達",tip:"檢查護照與網路"}, 
+            2: {icon:"☀️",text:"晴朗",tip:"適合戶外拍照"}, 
+            3: {icon:"🌧️",text:"小雨",tip:"記得帶摺疊傘"}, 
+            4: {icon:"☀️",text:"晴朗",tip:"去看夜景吧"}, 
+            5: {icon:"⛅",text:"陰天",tip:"氣溫舒適"}, 
+            6: {icon:"✈️",text:"返程",tip:"預留時間去機場"} 
+        };
+        const defaultData = { 
+            1: [{time:"16:30",title:"抵達東京成田",desc:"入境手續 & 領取周遊券",icon:"fa-plane"}], 
+            2: [{time:"10:30",title:"淺草雷門",desc:"拍照 & 吃人形燒",icon:"fa-camera"}, {time:"12:00",title:"晴空塔",desc:"午餐 & 購物",icon:"fa-shopping-bag"}], 
+            3:[], 4:[], 5:[], 6:[] 
+        };
         let currentDay=1, tripData={}, expenses=[];
 
+        // --- 初始化 ---
         function init() {
             try { loadData(); } catch(e) { tripData=JSON.parse(JSON.stringify(defaultData)); }
-            renderDateNav(); renderTimeline(currentDay); updateWeather(); renderExpenses();
+            renderDateNav(); 
+            renderTimeline(currentDay); 
+            updateWeather(); 
+            renderExpenses(); 
+            startClock(); // 啟動時鐘
         }
-        function loadData() {
-            const s1=localStorage.getItem('trip_v_api'); const s2=localStorage.getItem('exp_v_api');
-            tripData=s1?JSON.parse(s1):JSON.parse(JSON.stringify(defaultData)); expenses=s2?JSON.parse(s2):[];
-        }
-        function saveData() { localStorage.setItem('trip_v_api',JSON.stringify(tripData)); localStorage.setItem('exp_v_api',JSON.stringify(expenses)); }
-        function resetData() { if(confirm('重置資料？')) { tripData=JSON.parse(JSON.stringify(defaultData)); saveData(); renderTimeline(currentDay); } }
 
-        // Render Logic
+        // --- 資料存取 ---
+        function loadData() {
+            const s1=localStorage.getItem('trip_v_api'); 
+            const s2=localStorage.getItem('exp_v_api');
+            tripData=s1?JSON.parse(s1):JSON.parse(JSON.stringify(defaultData)); 
+            expenses=s2?JSON.parse(s2):[];
+        }
+        function saveData() { 
+            localStorage.setItem('trip_v_api',JSON.stringify(tripData)); 
+            localStorage.setItem('exp_v_api',JSON.stringify(expenses)); 
+        }
+
+        // --- 時鐘功能 ---
+        function startClock() {
+            const update = () => {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-GB', { hour12: false }); // 24小時制
+                document.getElementById('time-text').innerText = timeStr;
+            };
+            update();
+            setInterval(update, 1000);
+        }
+
+        // --- 回到頂部功能 ---
+        window.onscroll = function() {
+            const btn = document.getElementById('backToTopBtn');
+            // 當滾動超過 300px 時顯示按鈕
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
+            }
+        };
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 畫面渲染 ---
         function renderDateNav() {
             let html=''; ['2/20','2/21','2/22','2/23','2/24','2/25'].forEach((d,i)=>{
                 html+=`<div class="date-card ${i+1===currentDay?'active':''}" onclick="changeDay(${i+1})"><div class="date-text">${d}</div><div class="day-text">D${i+1}</div></div>`;
             }); document.getElementById('dateNav').innerHTML=html;
         }
-        function changeDay(d) { currentDay=d; renderDateNav(); renderTimeline(d); updateWeather(); }
-        function updateWeather() { const w=weatherData[currentDay]||weatherData[1]; document.getElementById('weatherIcon').innerText=w.icon; document.getElementById('weatherText').innerText=w.text; document.getElementById('weatherTip').innerText=w.tip; }
+        
+        function changeDay(d) { 
+            currentDay=d; 
+            renderDateNav(); 
+            renderTimeline(d); 
+            updateWeather(); 
+            scrollToTop(); // 切換日期時回到頂部
+        }
+        
+        function updateWeather() { 
+            const w=weatherData[currentDay]||weatherData[1]; 
+            document.getElementById('weatherIcon').innerText=w.icon; 
+            document.getElementById('weatherText').innerText=w.text; 
+            document.getElementById('weatherTip').innerText=w.tip; 
+        }
         
         function renderTimeline(d) {
             const list=tripData[d]||[]; list.sort((a,b)=>a.time.localeCompare(b.time));
             let html='';
-            if(list.length===0) html='<div style="text-align:center; padding:40px; color:#999;">👻 無行程</div>';
+            if(list.length===0) html='<div style="text-align:center; padding:60px 20px; color:#94a3b8;"><i class="fas fa-wind" style="font-size:40px; margin-bottom:10px; display:block; opacity:0.5;"></i>本日無行程<br>點擊右下角 + 新增</div>';
             list.forEach((item,idx)=>{
-                html+=`<div class="timeline-item"><div class="time-box"><div style="font-size:10px;color:#888;">${item.time.split(':')[0]>=12?'PM':'AM'}</div><div style="font-size:20px;font-weight:800;">${item.time}</div></div>
+                html+=`<div class="timeline-item"><div class="time-box"><div style="font-size:11px;color:#94a3b8; font-weight:600;">${item.time.split(':')[0]>=12?'PM':'AM'}</div><div style="font-size:22px;font-weight:800; color:var(--text-dark);">${item.time}</div></div>
                 <div class="content-card"><i class="fas ${item.icon} card-icon-bg"></i><button class="btn-delete" onclick="delItem(${d},${idx})"><i class="fas fa-trash"></i></button>
-                <div style="font-weight:bold; margin-bottom:5px;">${item.title}</div><div style="font-size:13px; color:#f97316;">${item.desc}</div></div></div>`;
+                <div style="font-weight:bold; font-size:17px; margin-bottom:6px; color:#1e293b;">${item.title}</div><div style="font-size:14px; color:#64748b;">${item.desc}</div></div></div>`;
             }); document.getElementById('timeline-list').innerHTML=html;
         }
 
-        // Actions
+        // --- 互動功能 ---
         function openModal() { document.getElementById('addModal').style.display='flex'; }
         function closeModal() { document.getElementById('addModal').style.display='none'; }
+        
         function saveNewItem() {
             const t=document.getElementById('input-title').value;
             if(!t) return alert('請輸入地點');
@@ -273,13 +556,19 @@
             }); saveData(); renderTimeline(currentDay); closeModal();
             document.getElementById('input-title').value=''; document.getElementById('input-desc').value='';
         }
-        function delItem(d,i) { if(confirm('刪除？')) { tripData[d].splice(i,1); saveData(); renderTimeline(d); } }
+        
+        function delItem(d,i) { 
+            if(confirm('確定要刪除這個行程嗎？')) { 
+                tripData[d].splice(i,1); saveData(); renderTimeline(d); 
+            } 
+        }
+        
         function openGoogleRoute() {
-            const list=tripData[currentDay]||[]; if(list.length<1) return alert('無行程');
+            const list=tripData[currentDay]||[]; if(list.length<1) return alert('今天沒有行程可以導航');
             window.open(`https://www.google.com/maps/dir/${list.map(i=>encodeURIComponent(i.title)).join('/')}`,'_blank');
         }
 
-        // --- 翻譯核心 (免費 API) ---
+        // --- 翻譯 API ---
         async function fetchTranslation() {
             const text = document.getElementById('trans-input').value;
             if(!text) return alert("請輸入中文");
@@ -288,20 +577,19 @@
             const resultBox = document.getElementById('trans-result-box');
             const output = document.getElementById('trans-output');
             
-            btn.innerText = "翻譯中...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 翻譯中...';
             btn.disabled = true;
 
             try {
-                // 使用 MyMemory 免費 API
+                // 使用 MyMemory API (免費)
                 const res = await fetch(`https://api.mymemory.translated.net/get?q=${text}&langpair=zh-TW|ja`);
                 const data = await res.json();
                 
                 if(data.responseData) {
-                    const translatedText = data.responseData.translatedText;
-                    output.innerText = translatedText;
-                    resultBox.style.display = 'flex'; // 顯示結果框
+                    output.innerText = data.responseData.translatedText;
+                    resultBox.style.display = 'flex';
                 } else {
-                    output.innerText = "翻譯失敗，請稍後再試";
+                    output.innerText = "翻譯失敗";
                 }
             } catch(e) {
                 alert("網路連線錯誤");
@@ -311,14 +599,13 @@
             }
         }
 
-        // 語音播放
         function speak(text) {
             if('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(text);
                 u.lang = 'ja-JP'; u.rate = 0.9;
                 window.speechSynthesis.speak(u);
-            } else alert("瀏覽器不支援語音");
+            } else alert("您的瀏覽器不支援發音功能");
         }
 
         function speakResult() {
@@ -326,29 +613,47 @@
             if(text && text !== "...") speak(text);
         }
 
-        // 頁面切換
+        // --- 頁面切換 ---
         function switchPage(id, el) {
             document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
             document.getElementById('page-'+id).classList.add('active'); el.classList.add('active');
+            
             const fabs = document.querySelectorAll('.fab-add, .fab-map-btn');
             fabs.forEach(f=>f.style.display=(id==='itinerary')?'flex':'none');
+            
+            // 只有在行程頁才需要監聽捲動顯示回到頂部按鈕
+            if(id!=='itinerary') {
+                document.getElementById('backToTopBtn').classList.remove('show');
+            } else {
+                scrollToTop();
+            }
         }
 
-        // 記帳
+        // --- 記帳 ---
         function addExpense() {
-            const n=document.getElementById('expense-name').value, a=parseFloat(document.getElementById('expense-amount').value);
-            if(n&&a) { expenses.push({name:n, amount:a}); saveData(); renderExpenses(); 
-            document.getElementById('expense-name').value=''; document.getElementById('expense-amount').value=''; }
+            const n=document.getElementById('expense-name').value;
+            const a=parseFloat(document.getElementById('expense-amount').value);
+            if(n&&a) { 
+                expenses.push({name:n, amount:a}); saveData(); renderExpenses(); 
+                document.getElementById('expense-name').value=''; document.getElementById('expense-amount').value=''; 
+            }
         }
-        function deleteExpense(i) { if(confirm('刪除記帳？')) { expenses.splice(i,1); saveData(); renderExpenses(); } }
-        function editExpense(i) {
-            const e=expenses[i]; document.getElementById('expense-name').value=e.name; document.getElementById('expense-amount').value=e.amount;
-            expenses.splice(i,1); saveData(); renderExpenses(); document.getElementById('budget-input-area').scrollIntoView({behavior:'smooth'});
+        function deleteExpense(i) { 
+            if(confirm('刪除這筆記帳？')) { 
+                expenses.splice(i,1); saveData(); renderExpenses(); 
+            } 
         }
         function renderExpenses() {
-            let t=0, h=''; expenses.forEach((e,i)=>{ t+=e.amount; h+=`<div class="budget-card"><div><div style="font-weight:bold;">${e.name}</div><div style="font-weight:800;color:#4f46e5;">¥ ${e.amount}</div></div><div><button class="btn-icon btn-edit" onclick="editExpense(${i})"><i class="fas fa-pen"></i></button> <button class="btn-icon btn-trash" onclick="deleteExpense(${i})"><i class="fas fa-trash"></i></button></div></div>`; });
-            document.getElementById('expense-list').innerHTML=h; document.getElementById('total-yen').innerText=t; document.getElementById('total-twd').innerText=Math.round(t*0.215);
+            let t=0, h=''; 
+            if(expenses.length===0) h='<div style="text-align:center;color:#94a3b8;padding:20px;">尚無消費紀錄</div>';
+            else expenses.forEach((e,i)=>{ 
+                t+=e.amount; 
+                h+=`<div class="budget-card"><div><div style="font-weight:bold; color:#1e293b;">${e.name}</div><div style="font-weight:800;color:var(--primary);margin-top:2px;">¥ ${e.amount}</div></div><div><button class="btn-icon btn-trash" style="background:#fee2e2; color:#ef4444; width:36px; height:36px; border-radius:50%; border:none; cursor:pointer;" onclick="deleteExpense(${i})"><i class="fas fa-trash"></i></button></div></div>`; 
+            });
+            document.getElementById('expense-list').innerHTML=h; 
+            document.getElementById('total-yen').innerText=t.toLocaleString(); 
+            document.getElementById('total-twd').innerText=Math.round(t*0.215).toLocaleString();
         }
 
         window.onload = init;
